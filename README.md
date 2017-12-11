@@ -1,5 +1,6 @@
 # stickDemo
 sticky demo project 
+
 一、场景
 
 需求：tab需要在划出视口的时候吸顶（sticky），方便点击切换下方内容。

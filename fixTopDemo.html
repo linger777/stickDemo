@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>fixTopDeom</title>
+    </head>
+    <body>
+        <style media="screen">
+            body{
+                margin: 0;
+            }
+            div{
+                width: 100%;
+            }
+            .banner {
+                /* overflow: hidden; */
+                height: 500px;
+                background-color: yellowgreen;
+            }
+            .tab {
+                height: 80px;
+                background-color: blue;
+            }
+            .content{
+                height: 3000px;
+            }
+            .fixed-top {
+                position: fixed;
+                /*width: 100%;*/
+                left: 0;
+                top: 0;
+                z-index: 10;
+            }
+            .sticky-top {
+                /* 滚过初始位置时自动吸顶 */
+                /*  */
+                position: -webkit-sticky;
+                position: sticky;
+                top: 0;
+                left: 0;
+                z-index: 10;
+            }
+        </style>
+
+        <script src="jquery.js" type="text/javascript"></script>
+        <!-- <script type="text/javascript" src="jquery.js"></script> -->
+
+        <div class="banner"></div>
+        <div class="tab sticky"></div>
+        <div class="content"></div>
+
+        <script type="text/javascript">
+        //吸顶start
+        var fixTop = {
+            stickyEl : $('.sticky'),
+            stickyT  : function() {
+                return this.stickyEl.offset().top;
+            },
+            num      : 0,
+            // bannerImg: document.getElementById("bannerImg"),
+            init     : function(){
+                // var u = navigator.userAgent;
+                // var isAndroid = u.indexOf('Android') > -1 || u.indexOf('Adr') > -1;
+                // var isiOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/);
+                var _num = this.num;
+                var isSupportSticky = this.isSupportSticky();
+                if (isSupportSticky) {
+                    this.sticky();
+                    return;
+                }                
+                this.scroll(_num);
+            },
+            scroll   : function(num){   //滚动监听添加fixed样式
+                var _this = this;
+                var _stickyT = _this.stickyT();
+                this.stickyHolder();
+                $(window).scroll(this.throttle(function(){
+                    // var scrollT = document.body.scrollTop;
+                    var scrollT = $(window).scrollTop();
+                    // console.log(scrollT,_stickyT-num);
+                    if (scrollT > (_stickyT-num)) {
+                        _this.stickyEl.addClass('fixed-top');
+                    } else {
+                        _this.stickyEl.removeClass('fixed-top');
+                    }
+                },10));
+            },
+            sticky  : function(){   //添加sticky样式
+                var _this = this;
+                _this.stickyEl.addClass('sticky-top');
+            },
+            isSupportSticky: function(){    //判断是否支持sticky
+                var prefixTestList = ['', '-webkit-'];
+                var stickyText = '';
+                for (var i = 0; i < prefixTestList.length; i++ ) {
+                    stickyText += 'position:' + prefixTestList[i] + 'sticky;';
+                }
+                // 创建一个dom来检查
+                var div = document.createElement('div');
+                div.style.cssText = stickyText;
+                document.body.appendChild(div);
+                var isSupport = /sticky/i.test(window.getComputedStyle(div).position);
+                document.body.removeChild(div);
+                div = null;
+                return isSupport;
+            },
+            stickyHolder: function(){   //守家占位符
+                var stickyHolder = document.createElement('div');
+                var stickyElDom = this.stickyEl.get(0);
+                var rect = stickyElDom.getBoundingClientRect();
+                // console.log(rect);
+                stickyElDom.parentNode.replaceChild(stickyHolder, stickyElDom);
+                stickyHolder.appendChild(stickyElDom);
+                stickyHolder.style.height = rect.height + 'px';
+            },
+            throttle: function(func, wait){ //函数截流
+                var timer = null;
+                return function() {
+                    var self = this,
+                    args = arguments;
+                    if (timer) clearTimeout(timer);
+                    timer = setTimeout(function() {
+                        return typeof func === 'function' && func.apply(self, args);
+                    }, wait);
+                }
+            }
+        }
+        fixTop.init();
+        //吸顶end
+        </script>
+    </body>
+</html>
